@@ -39,14 +39,20 @@ function distSq(x1, y1, x2, y2){
 while (true) {
     var zombies=[];
     var humans = [];
+    
+    //array of zombies closest to all humans
     var closestZombies = [];
+    //zombies which are very close to a human
     var dangerousZombies=[];
+    //tells the player to save a human from zombies rather than targetting nearby zombies
     var saveHuman=false;
 
     //Taking inputs
     var inputs = readline().split(' ');
     const x = parseInt(inputs[0]);
     const y = parseInt(inputs[1]);
+    
+    //making an array of all humans
     const humanCount = parseInt(readline());
     for (let i = 0; i < humanCount; i++) {
         var inputs = readline().split(' ');
@@ -59,7 +65,7 @@ while (true) {
 
     const zombieCount = parseInt(readline());
 
-    var nearest=Infinity;
+    //Making an array of all zombies
     for (let i = 0; i < zombieCount; i++) {
         var inputs = readline().split(' ');
         const zombieId = parseInt(inputs[0]);
@@ -71,13 +77,13 @@ while (true) {
         zombies.push(new Zombie(zombieX, zombieY));
 
     }
+    //finding closest zombies to humans
     for(var i=0;i<humans.length;i++){
         var human = humans[i];
         closestZombies.push(human.findClosestZombie());
     }
 
-
-    var nearest=Infinity;
+    //finding the 'dangerous' zombies
     for(var i=0;i<closestZombies.length;i++){
             var d = distSq(humans[i].x, humans[i].y, closestZombies[i].x, closestZombies[i].y);
             if(d <= 2000*2000){
@@ -96,7 +102,7 @@ while (true) {
         }
 
 
-
+    //targetting the zombie nearest to me out of the zombies which are close to humans
     if(saveHuman){
         var nearest=Infinity;
         for(var zombie of dangerousZombies){
@@ -107,7 +113,9 @@ while (true) {
                 targetY = zombie.y;
             }
         }
+     //Just targetting nearby zombies
     }else{
+        var nearest = Infinity;
         for(var zombie of zombies){
             var d = distSq(x,y,zombie.x, zombie.y);
             if(d < nearest){
@@ -118,12 +126,10 @@ while (true) {
         }
     }
 
-
+    //If only one human is left protect him
     if(humanCount === 1){
-        var zombie = humans[0].findClosestZombie();
-        console.error(zombie);
-        targetX = zombie.x;
-        targetY = zombie.y;
+        targetX = humans[0].x;
+        targetY = humans[0].y;
     }
 
 
