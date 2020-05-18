@@ -1,0 +1,136 @@
+/**
+ * Save humans, destroy zombies!
+ **/
+var targetX, targetY;
+
+class Human{
+    constructor(x,y){
+        this.x=x;
+        this.y=y;
+    }
+    findClosestZombie(){
+        var nearest=Infinity;
+        var closeZombie;
+        for(var i=0;i<zombies.length;i++){
+            var d = distSq(this.x, this.y, zombies[i].x, zombies[i].y);
+            if(d < nearest){
+                nearest=d;
+                closeZombie = zombies[i];
+            }
+        }
+        return closeZombie;
+    }
+}
+
+class Zombie{
+    constructor(x,y){
+        this.x=x;
+        this.y=y;
+    }
+}
+
+
+function distSq(x1, y1, x2, y2){
+    return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
+}
+
+
+// game loop
+while (true) {
+    var zombies=[];
+    var humans = [];
+    var closestZombies = [];
+    var dangerousZombies=[];
+    var saveHuman=false;
+
+    //Taking inputs
+    var inputs = readline().split(' ');
+    const x = parseInt(inputs[0]);
+    const y = parseInt(inputs[1]);
+    const humanCount = parseInt(readline());
+    for (let i = 0; i < humanCount; i++) {
+        var inputs = readline().split(' ');
+        const humanId = parseInt(inputs[0]);
+        const humanX = parseInt(inputs[1]);
+        const humanY = parseInt(inputs[2]);
+
+        humans.push(new Human(humanX,humanY));
+    }
+
+    const zombieCount = parseInt(readline());
+
+    var nearest=Infinity;
+    for (let i = 0; i < zombieCount; i++) {
+        var inputs = readline().split(' ');
+        const zombieId = parseInt(inputs[0]);
+        const zombieX = parseInt(inputs[1]);
+        const zombieY = parseInt(inputs[2]);
+        const zombieXNext = parseInt(inputs[3]);
+        const zombieYNext = parseInt(inputs[4]);
+
+        zombies.push(new Zombie(zombieX, zombieY));
+
+    }
+    for(var i=0;i<humans.length;i++){
+        var human = humans[i];
+        closestZombies.push(human.findClosestZombie());
+    }
+
+
+    var nearest=Infinity;
+    for(var i=0;i<closestZombies.length;i++){
+            var d = distSq(humans[i].x, humans[i].y, closestZombies[i].x, closestZombies[i].y);
+            if(d <= 2000*2000){
+                myD = distSq(x,y,closestZombies[i].x, closestZombies[i].y);
+                var numTurnsZombie = Math.ceil(d/400) - 1;
+                var numTurnsMe = Math.ceil(myD/1000) - 1;
+                // if(d<=900*900 && humanCount>1 && myD > 4000*4000){
+                //     //too late so leave him, i.e, remove him from the list
+                //     humans = humans.splice(i,1);
+                //     closestZombies.splice(i,1);
+                //     break;
+                // }
+                saveHuman = true;
+                dangerousZombies.push(closestZombies[i])               
+            }
+        }
+
+
+
+    if(saveHuman){
+        var nearest=Infinity;
+        for(var zombie of dangerousZombies){
+            var d = distSq(x,y,zombie.x, zombie.y);
+            if(d < nearest){
+                nearest = d;
+                targetX = zombie.x;
+                targetY = zombie.y;
+            }
+        }
+    }else{
+        for(var zombie of zombies){
+            var d = distSq(x,y,zombie.x, zombie.y);
+            if(d < nearest){
+                nearest = d;
+                targetX = zombie.x;
+                targetY = zombie.y;
+            }
+        }
+    }
+
+
+    if(humanCount === 1){
+        var zombie = humans[0].findClosestZombie();
+        console.error(zombie);
+        targetX = zombie.x;
+        targetY = zombie.y;
+    }
+
+
+
+    // Write an action using console.log()
+    // To debug: console.error('Debug messages...');
+
+    console.log(targetX+' '+targetY);     // Your destination coordinates
+
+}
